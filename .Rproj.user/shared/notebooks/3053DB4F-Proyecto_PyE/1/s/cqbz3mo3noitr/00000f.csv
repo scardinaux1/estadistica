@@ -1,0 +1,8 @@
+"0","Escolaridad <- table(na.omit(gsub(""-"", NA, Datos1$Escolaridad)))
+Mediana<-median(Escolaridad, na.rm=TRUE)
+Mediana
+"
+"1","[1]"
+"1"," 591"
+"1","
+"

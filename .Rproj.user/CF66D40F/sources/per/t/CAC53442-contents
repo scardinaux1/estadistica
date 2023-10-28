@@ -1,0 +1,129 @@
+---
+title: "Proyect_PyE"
+author: "Santiago Jiménez - Sarah Cardinaux"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 7 #para controlar el ancho
+    fig_height: 6 #para controlar el alto
+    fig_caption: true #fig_caption controla si las figuras se representan con subtítulos.
+    toc: true # Añadir tabla de contenido (TOC)
+    toc_float:
+      collapsed: true #collapsed(el valor predeterminado es TRUE) controla si el TOC aparece solo con los encabezados de nivel superior (por ejemplo, H2). Si se contrae inicialmente, el TOC se expande automáticamente en línea cuando es necesario.
+      smooth_scroll: true #smooth_scroll(predeterminado en TRUE) controla si los desplazamientos de página están animados cuando se navega a los elementos de la TOC mediante clics del mouse.
+    df_print: paged # Para que la tabla tenga en formato de HTML
+    code_folding: hide # controla la aparición del código
+---
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(modeest)
+library(moments)
+library(imputeTS)
+
+Datos <- read_excel("homicidios-ven-col.xlsx", 
+    sheet = "Base")
+
+Datos1<-Datos[Datos$Cantidad==1,]
+attach(Datos1)
+
+Edad<-as.numeric(Datos1$Edad)
+Sexo<-as.character(Datos1$Sexo)
+tabla_Sexo<-table(as.character(Datos1$Sexo))
+Departamento<-as.character(Datos1$Departamento)
+```
+---
+
+
+```
+{r cols.print=10, rows.print=3}
+mtcars
+```
+
+```{r}
+hist(Edad, col="#baafc4", xlim=c(10,100),ylim=c(500,10000),xlab="Edad(Años)",ylab="Cantidad")
+```
+# Explicación Edad
+
+Al realizar un analisis respecto a la edad de los homicidios ocurridos en Colombia entre los años 2016 y 2019 se deduce que la mayor tasa de muertos por edad se encuentra en las poblaciones cercanas a los 30 años
+
+```{r}
+####MEDIA VARIAABLE CUANTITATIVA
+Edad_NA<-as.numeric(na.omit(Datos1$Edad))
+media <- round(mean(Edad_NA, na.rm = TRUE),2)
+paste("Usando mean(), para determinar la media de los datos =", media)
+
+####MEDIANA VARIABLE CUANITATIVA
+mediana <- median(Edad_NA, na.rm=TRUE)
+print(mediana)
+
+#### QUARTILES VARIABLE CUNTITATIVA
+quartileEdad<-quantile(Edad_NA, na.rm = TRUE)
+quartileEdad
+
+####ASIMETRIA VARIABLE CUANTITATIVA
+asimetria_EDAD<-skewness(Edad_NA, na.rm = TRUE)
+asimetria_EDAD
+
+####
+curtosis_EDAD<-kurtosis(Edad_NA, na.rm = TRUE)
+curtosis_EDAD
+```
+# Explicación Sexo
+
+De todos estos asesinatos decidimos realizar la comparación entre el sexo de las victimas, nos encontramos con que el xxxx% del total de las victimas son hombres, mientras el xxxx% de las victimas son mujeres.
+
+```{r}
+porcentaje_sexo<-100*prop.table(table(Datos1$Sexo))
+barplot(porcentaje_sexo,ylim=c(0,100) ,xlab="Sexo", ylab="Porcentaje")
+summary(porcentaje_sexo)
+```
+
+# Explicación Departamento
+
+```{r}
+porcentaje <- prop.table(table(Datos1$Departamento))
+porcentaje<-porcentaje*100
+
+barplot(porcentaje,xlim=c(0,33),ylim=c(0,20),xlab=" ", ylab="Porcentaje", las=2, cex.names = 0.5)
+porcentaje
+```
+
+# Expliación BoxPlot
+
+```{r}
+boxplot(Edad, ylab = "Edad", col= "#bf6370")
+
+boxplot(Edad~Sexo, ylab = "Edad", xlab = "Sexo" ,col= "#ed6464")
+
+Fecha<-as.Date(Datos1$Fecha)
+
+plot(Datos1$Edad, Fecha)
+
+Fecha_freq<-table(Datos1$Fecha)
+Edad_freq<-table(Datos1$Edad)
+
+```
+# Escolaridad
+```{r}
+############### MEDIA VARIABLE CUALITATIVA
+Escolaridad <- table(na.omit(gsub("-", NA, Datos1$Escolaridad)))
+Mediana<-median(Escolaridad, na.rm=TRUE)
+Mediana
+
+quartiles <- quantile(Escolaridad, na.rm = TRUE)
+
+quartiles
+
+porcentaje <- prop.table(table(na.omit(gsub("-", NA, Datos1$Escolaridad))))
+porcentaje <- porcentaje*100
+
+barplot(porcentaje,xlim=c(0,100),ylim=c(0,9),xlab="Porcentaje", ylab=" ", las=1, cex.names = 0.5, horiz = TRUE)
+
+length(Datos1$Escolaridad)
+
+mediana<-names(which.max(Escolaridad))
+paste("Usando mean(), para determinar la media de los datos =", media)
+
+```

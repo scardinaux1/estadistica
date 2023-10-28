@@ -1,0 +1,185 @@
+---
+title: "Victimas de Homicidio en Colombia"
+author: "Santiago Jiménez - Sarah Cardinaux"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 7 #para controlar el ancho
+    fig_height: 6 #para controlar el alto
+    fig_caption: true #fig_caption controla si las figuras se representan con subtítulos.
+    toc: true # Añadir tabla de contenido (TOC)
+    toc_float:
+      collapsed: true #collapsed(el valor predeterminado es TRUE) controla si el TOC aparece solo con los encabezados de nivel superior (por ejemplo, H2). Si se contrae inicialmente, el TOC se expande automáticamente en línea cuando es necesario.
+      smooth_scroll: true #smooth_scroll(predeterminado en TRUE) controla si los desplazamientos de página están animados cuando se navega a los elementos de la TOC mediante clics del mouse.
+    df_print: paged # Para que la tabla tenga en formato de HTML
+    code_folding: hide # controla la aparición del código
+---
+Introduccion
+
+El análisis de las víctimas de homicidios en Colombia es crucial para comprender y abordar la complejidad de este fenómeno. Este país ha enfrentado desafíos significativos en términos de seguridad y violencia, lo que subraya la importancia de examinar detenidamente las características, tendencias y factores asociados con estas tragedias. Este estudio se enfocará en proporcionar una visión detallada y analítica de las víctimas de homicidios en Colombia, con el propósito de informar a la sociedad.
+```{r}
+library(readxl)
+library(ggplot2)
+library(modeest)
+library(moments)
+library(imputeTS)
+
+Datos <- read_excel("homicidios-ven-col.xlsx", 
+    sheet = "Base")
+
+Datos1<-Datos[Datos$Cantidad==1,]
+attach(Datos1)
+
+Edad<-as.numeric(Datos1$Edad)
+Sexo<-as.character(Datos1$Sexo)
+tabla_Sexo<-table(as.character(Datos1$Sexo))
+Departamento<-as.character(Datos1$Departamento)
+```
+---
+
+
+```
+{r cols.print=10, rows.print=3}
+mtcars
+```
+A continuacion presentaremos un histograma sobre la edad de las victimas de homicidios.
+```{r}
+hist(Edad, col="#f36444", xlim=c(10,100),ylim=c(500,10000),xlab="Edad(Años)",ylab="Cantidad")
+```
+
+Nos encontramos que el pico de los datos ocurre entorno a los 25 a 30 anos de edad de la victima.
+
+
+Ahora encontraras los indicadores de tendencia central, posicion y forma.
+
+
+```{r}
+####MEDIA VARIABLE CUANTITATIVA
+Edad_NA<-as.numeric(na.omit(Datos1$Edad))
+media <- round(mean(Edad_NA, na.rm = TRUE),2)
+paste("La media de los datos =", media)
+```
+Media
+La media representa el punto de equilibrio de la distribución.
+
+```{r}
+####MEDIANA VARIABLE CUANTITATIVA
+mediana <- median(Edad_NA, na.rm=TRUE)
+print(mediana)
+```
+Mediana
+Numero intermedio de un grupo de numeros, en este caso 30 que es la tendencia de la edad de la mayoria de las victimas
+
+
+```{r}
+####ASIMETRIA VARIABLE CUANTITATIVA
+asimetria_EDAD<-skewness(Edad_NA, na.rm = TRUE)
+asimetria_EDAD
+```
+Asimetria
+El resultad positivo de este indicador significa que la distribución se encuentra sesgada hacia la izquierda o sea que cuenta con una orientación positiva
+
+```{r}
+# Curtosis
+curtosis_EDAD<-kurtosis(Edad_NA, na.rm = TRUE)
+curtosis_EDAD
+```
+Curtosis
+Nos indica que la distribución de los datos es muy leptocúrtica. Esto significa que tiene picos muy pronunciados en el centro y colas muy largas en comparación con una distribución normal.
+
+
+# Comparacion de victimas por sexo
+
+De todos estos homicidios decidimos analizar la diferencia entre los géneros de las víctimas. Encontramos que el 91.37% del total de las víctimas son hombres, mientras que el 8.62% corresponden a mujeres.
+
+```{r}
+porcentaje_sexo<-100*prop.table(table(Datos1$Sexo))
+barplot(porcentaje_sexo,col = c("#ffce6f","#670d0f"), ylim=c(0,100), xlab="Sexo", ylab="Porcentaje") 
+summary(porcentaje_sexo)
+```
+
+# Distribucion de Homicidios por Departamento
+
+```{r}
+porcentaje <- prop.table(table(Datos1$Departamento))
+porcentaje<-porcentaje*100
+
+barplot(porcentaje,col= c ("#6c043c"),xlim=c(0,33),ylim=c(0,20),xlab=" ", ylab="Porcentaje", las=2, cex.names = 0.5) 
+porcentaje
+#revisar valores exactos y cambiarlos en la leyenda
+```
+Entre los departamentos analizados, Valle se destacó como el de mayor número de homicidios, totalizando con %18.69 , seguido por Antioquia y Cundinamarca, teniendo en cuenta que son los departamentos mas poblados del pais. Por otro lado, Vaupés presentó la menor incidencia con %0.02, seguido de cerca por Guainia.
+
+# Análisis de Edades: Tendencias y Valores Atípicos
+
+
+```{r}
+boxplot(Edad, ylab = "Edad", col= "#f36444")
+#revisar valores exactos y cambiarlos en la leyenda
+```
+Comparando la mediana, notamos que el 50% de las víctimas tenían 30 años. Un cuarto de ellas eran menores de 23 años, mientras que detectamos múltiples valores inusuales, los cuales se interpretan como puntos fuera del límite superior, excediendo los 60 años.
+
+```{r}
+#### CUARTILES VARIABLE CUNTITATIVA
+quartileEdad<-quantile(Edad_NA, na.rm = TRUE)
+quartileEdad
+```
+Cuartiles
+La funcion de los cuartiles es informar del valor de la variable que ocupara la posicion (en tanto por cien) que nos interese respecto de todo el conjunto de variables.
+
+
+
+# Análisis de Edades por Sexo: Diagrama de Cajas y Alambres
+
+```{r}
+boxplot(Edad~Sexo, ylab = "Edad", xlab = "Sexo" ,col= "#f36444")
+stripchart(Edad~Sexo, vertical = TRUE, method = "jitter", pch = 19, add = TRUE, col = 3:length(levels(chickwts$feed)))
+#revisar valores exactos y cambiarlos en la leyenda
+```
+Comparando las medianas de ambos géneros, se evidencia que el 50% de las muestras, tanto en el grupo masculino como en el femenino, es similar. No obstante, en el grupo femenino, se aprecia que el 75% de las muestras son menores a 40 años, mientras que en el grupo masculino este mismo porcentaje corresponde a menores de 38 años. Respecto a los valores atípicos, se presentan más casos en el grupo masculino que superan los 63 años, mientras que en el grupo femenino se observan casos que superan los 70 años. 
+
+# Relación entre Fecha y Edad: Diagrama de Dispersión
+
+En el presente gráfico de dispersión, se aprecia que a lo largo de los años, la mayoría de las víctimas han permanecido en el rango de edades de 20 a 40 años. No obstante, a pesar del transcurso del tiempo, no se evidencia ni un incremento ni una reducción en los homicidios; la situación se mantiene constante.    
+```{r}
+Fecha<-as.Date(Datos1$Fecha)
+
+plot(Edad, Fecha, col = c ("#210123"))
+
+Fecha_freq<-table(Datos1$Fecha)
+Edad_freq<-table(Datos1$Edad) 
+
+```
+# Análisis de Nivel de Educación de las Víctimas
+
+
+```{r}
+porcentaje_educacion <- prop.table(table(na.omit(gsub("-", NA, Datos1$Escolaridad)))) 
+porcentaje_educacion<- porcentaje_educacion*100 
+```
+
+El 60% de las víctimas poseían formación de nivel secundario, seguido por un 33.5% que tenía educación primaria. El porcentaje más reducido se registra en el grupo de tecnólogos, representando un 0.05%.
+```{r}
+barplot(porcentaje_educacion, col = c ("#b14623"), xlim=c(0,100),ylim=c(0,9),xlab="Porcentaje", ylab=" ", las=1, cex.names = 0.5, horiz = TRUE)
+porcentaje_educacion
+length(Datos1$Escolaridad)
+```
+Indicadores de tendencia central, posición y forma.
+```{r}
+mediana<-names(which.max(Escolaridad))
+paste("La media de los datos =", media)
+
+```
+Media
+```{r}
+#### MEDIA VARIABLE CUALITATIVA
+Escolaridad <- table(na.omit(gsub("-", NA, Datos1$Escolaridad)))
+Mediana<-median(Escolaridad, na.rm=TRUE)
+Mediana
+```
+
+```{r}quartiles <- quantile(Escolaridad, na.rm = TRUE)
+
+quartiles
+```
+Cuartiles
