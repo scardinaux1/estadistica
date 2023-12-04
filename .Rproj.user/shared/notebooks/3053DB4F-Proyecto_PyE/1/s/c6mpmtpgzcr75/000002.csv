@@ -1,3 +1,0 @@
-"0","```r
-plot(mtcars$mpg,mtcars$disp)
-```"

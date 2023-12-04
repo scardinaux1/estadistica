@@ -1,9 +1,9 @@
 {
     "id": "CAC53442",
-    "path": "C:/Users/M/Desktop/RStudio/PyE_Proyecto/Proyecto_PyE.Rmd",
+    "path": "C:/Users/M/Desktop/RStudio/PyE_Proyecto/estadistica/Proyecto_PyE.Rmd",
     "project_path": "Proyecto_PyE.Rmd",
     "type": "r_markdown",
-    "hash": "2830500738",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1696290431027.0,
@@ -13,15 +13,16 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "10,14",
-        "scrollLine": "0"
+        "cursorPosition": "14,2",
+        "scrollLine": "2",
+        "last_setup_crc32": "d7aeb6a89d86ac4"
     },
     "folds": "",
-    "lastKnownWriteTime": 1698296007,
+    "lastKnownWriteTime": 1701648760,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1698296011929,
+    "last_content_update": 1701648760756,
     "read_only": false,
     "read_only_alternatives": []
 }

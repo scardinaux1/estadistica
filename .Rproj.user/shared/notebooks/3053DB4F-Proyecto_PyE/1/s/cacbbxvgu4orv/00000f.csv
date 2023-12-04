@@ -1,6 +1,0 @@
-"0","porcentaje_educacion <- prop.table(table(na.omit(gsub(""-"", NA, Datos1$Escolaridad)))) 
-porcentaje_educacion<- porcentaje_educacion*100 
-```
-"
-"2","Error: attempt to use zero-length variable name
-"
